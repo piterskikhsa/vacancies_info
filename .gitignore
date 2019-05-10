@@ -1,0 +1,10 @@
+/images/
+
+.env
+.idea/
+*.txt
+*.checkpoint
+*.log
+
+__pycache__/
+*.py[cod]
