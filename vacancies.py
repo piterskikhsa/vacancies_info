@@ -34,17 +34,17 @@ def get_salary_vacancies(vacancies):
     return salaries
 
 
-# def predict_rub_salary(vacancy):
-#     if not is_salary_currency(vacancy, 'RUR'):
-#         return None
-#     return calculate_salary(vacancy['salary'])
-#
-#
-# def is_salary_currency(vacancy, currency):
-#     vacancy_salary = vacancy['salary']
-#     if not vacancy_salary:
-#         return False
-#     return vacancy_salary['currency'] == currency
+def predict_rub_salary(vacancy):
+    if not is_salary_currency(vacancy, 'RUR'):
+        return None
+    return calculate_salary(vacancy['salary'])
+
+
+def is_salary_currency(vacancy, currency):
+    vacancy_salary = vacancy['salary']
+    if not vacancy_salary:
+        return False
+    return vacancy_salary['currency'] == currency
 
 
 def calculate_salary(salary):
