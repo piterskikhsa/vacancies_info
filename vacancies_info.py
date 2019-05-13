@@ -1,6 +1,7 @@
 import os
 
 from dotenv import load_dotenv
+from terminaltables import AsciiTable
 import requests
 
 
@@ -71,7 +72,7 @@ def get_all_hh_vacancies(search_vacancy):
         page_number = vacancy_info['pages']
         page += 1
         vacancies['items'].extend(vacancy_info['items'])
-        if not vacancies['found']:
+        if not vacancies.get('found'):
             vacancies['found'] = vacancy_info['found']
     return vacancies
 
@@ -97,7 +98,7 @@ def get_all_sj_vacancies(search_vacancy):
             page_number_not_calc = False
         page += 1
         vacancies['items'].extend(vacancy_info['objects'])
-        if not vacancies['found']:
+        if not vacancies.get('found'):
             vacancies['found'] = vacancy_info['total']
     return vacancies
 
@@ -122,6 +123,15 @@ def get_sj_vacancy_info(vacancy):
     return vacancy_info
 
 
+def formate_table(vacancy_info):
+    table_header = ['Язык программирования', 'Вакансий найдено', 'Вакансий обработано', 'Средняя зарплата']
+    table_data = [
+        table_header,
+        [vacancy_info.keys(), vacancy_info.items()]
+    ]
+    return table_data
+
+
 def main():
     vacancies_list = [
         'JavaScript',
@@ -131,6 +141,18 @@ def main():
         'Swift',
         'PHP'
     ]
+    for vacancy in vacancies_list:
+        hh_info = get_hh_vacancy_info(vacancy)
+        # sj_info = get_all_sj_vacancies(vacancy)
+        print(hh_info)
+        info = formate_table(hh_info)
+        print(info)
+        # # 
+        # # table = AsciiTable(table_data)
+
+        # print(table.table)
+
+    
 
 
 if __name__ == '__main__':

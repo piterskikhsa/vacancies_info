@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "d290d4924cb37084c418489ac8675b59e931db1ee988774993a31c8907e1d427"
+            "sha256": "378f8940217be39bfe29ced9e0cc976f7f558c0911ce6b443ce71907d897da89"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -39,11 +39,11 @@
         },
         "python-dotenv": {
             "hashes": [
-                "sha256:a84569d0e00d178bc5b957f7ff208bf49287cbf61857c31c258c4a91f571527b",
-                "sha256:c9b1ddd3cdbe75c7d462cb84674d87130f4b948f090f02c7d7144779afb99ae0"
+                "sha256:156f218846bd90e0d537915545cde4a987947c2cecc628b50f9955fdde72534a",
+                "sha256:6640acd76e6cab84648e4fec16c9d19de6700971f9d91d045e7120622167bfda"
             ],
             "index": "pypi",
-            "version": "==0.10.1"
+            "version": "==0.10.2"
         },
         "requests": {
             "hashes": [
@@ -52,6 +52,13 @@
             ],
             "index": "pypi",
             "version": "==2.21.0"
+        },
+        "terminaltables": {
+            "hashes": [
+                "sha256:f3eb0eb92e3833972ac36796293ca0906e998dc3be91fbe1f8615b331b853b81"
+            ],
+            "index": "pypi",
+            "version": "==3.1.0"
         },
         "urllib3": {
             "hashes": [
