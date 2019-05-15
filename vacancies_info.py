@@ -1,4 +1,6 @@
 import os
+from pprint import pprint
+from time import sleep
 
 from dotenv import load_dotenv
 from terminaltables import AsciiTable
@@ -42,16 +44,21 @@ def get_predict_rub_salary_sj(vacancy):
     return get_predict_salary(vacancy['payment_from'], vacancy['payment_to'])
 
 
-def get_vacancies_found(vacancies):
-    pass
+def get_salary_from_vacancies(vacancies_list, func_predict):
+    salary = []
+    for vacancy in vacancies_list:
+        salary.append(func_predict(vacancy))
+    return salary
 
 
-def get_vacancies_processed(vacancies):
-    pass
+def get_average_salary(salaries):
+    salaries = [salary for salary in salaries if salary]
+    try:
+        average_salary = sum(salaries) / len(salaries)
+    except ZeroDivisionError:
+        return 0
 
-
-def get_average_salary(vacancies):
-    pass
+    return int(average_salary)
 
 
 def get_all_hh_vacancies(search_vacancy):
@@ -69,6 +76,7 @@ def get_all_hh_vacancies(search_vacancy):
     while page < page_number:
         params['page'] = page
         vacancy_info = get_vacancies(url, params)
+        sleep(0.5)
         page_number = vacancy_info['pages']
         page += 1
         vacancies['items'].extend(vacancy_info['items'])
@@ -105,30 +113,38 @@ def get_all_sj_vacancies(search_vacancy):
 
 def get_hh_vacancy_info(vacancy):
     vacancies = get_all_hh_vacancies(vacancy)
+    vacancies_salary = get_salary_from_vacancies(vacancies['items'], get_predict_rub_salary_hh)
     vacancy_info = {
         "vacancies_found": vacancies['found'],
-        "vacancies_processed": get_vacancies_processed(vacancies),
-        "average_salary": get_average_salary(vacancies)
+        "vacancies_processed": len(list(filter(lambda x: x, vacancies_salary))),
+        "average_salary": get_average_salary(vacancies_salary)
     }
     return vacancy_info
 
 
 def get_sj_vacancy_info(vacancy):
     vacancies = get_all_sj_vacancies(vacancy)
+    vacancies_salary = get_salary_from_vacancies(vacancies['items'], get_predict_rub_salary_sj)
     vacancy_info = {
-        "vacancies_found": vacancies['total'],
-        "vacancies_processed": get_vacancies_processed(vacancies),
-        "average_salary": get_average_salary(vacancies)
+        "vacancies_found": vacancies['found'],
+        "vacancies_processed": len(list(filter(lambda x: x, vacancies_salary))),
+        "average_salary": get_average_salary(vacancies_salary)
     }
     return vacancy_info
 
 
-def formate_table(vacancy_info):
+def formate_table(vacancies_info):
     table_header = ['Язык программирования', 'Вакансий найдено', 'Вакансий обработано', 'Средняя зарплата']
     table_data = [
         table_header,
-        [vacancy_info.keys(), vacancy_info.items()]
     ]
+    for vacancy, vacancies_info in vacancies_info.items():
+        table_row = [vacancy,
+                     vacancies_info['vacancies_found'],
+                     vacancies_info['vacancies_processed'],
+                     vacancies_info['average_salary']
+                     ]
+        table_data.append(table_row)
     return table_data
 
 
@@ -141,18 +157,20 @@ def main():
         'Swift',
         'PHP'
     ]
+    result_sj = {}
+    result_hh = {}
     for vacancy in vacancies_list:
-        hh_info = get_hh_vacancy_info(vacancy)
-        # sj_info = get_all_sj_vacancies(vacancy)
-        print(hh_info)
-        info = formate_table(hh_info)
-        print(info)
-        # # 
-        # # table = AsciiTable(table_data)
+        result_hh[vacancy] = get_hh_vacancy_info(vacancy)
+        result_sj[vacancy] = get_sj_vacancy_info(vacancy)
 
-        # print(table.table)
+    hh_info_table = formate_table(result_hh)
+    sj_info_table = formate_table(result_sj)
 
-    
+    hh_table = AsciiTable(hh_info_table)
+    sj_table = AsciiTable(sj_info_table)
+
+    print(hh_table.table)
+    print(sj_table.table)
 
 
 if __name__ == '__main__':
