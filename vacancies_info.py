@@ -10,6 +10,8 @@ import requests
 load_dotenv()
 
 
+QUERY_TIMEOUT = 0.5
+
 def is_salary_rub(vacancy_salary, currency):
     return vacancy_salary['currency'] == currency
 
@@ -26,7 +28,11 @@ def get_predict_salary(salary_from, salary_to):
 
 
 def get_vacancies(url, parameters, header=None):
-    response = requests.get(url, params=parameters, headers=header)
+    try:
+        response = requests.get(url, params=parameters, headers=header)
+    except ConnectionError:
+        sleep(QUERY_TIMEOUT)
+        response = requests.get(url, params=parameters, headers=header)
     response.raise_for_status()
     return response.json()
 
@@ -143,9 +149,8 @@ def print_info_from_vacancies_site(vacancies_job, api_handlers):
             vacancies_info[vacancy] = get_vacancy_info(vacancies, predict_handler)
 
         vacancies_info_table = formate_table(vacancies_info)
-
-        table = AsciiTable(vacancies_info_table)
-        print(f'Вакансии с {site_name}')
+        title = f'{site_name} Moscow'
+        table = AsciiTable(vacancies_info_table, title)
         print(table.table)
 
 
