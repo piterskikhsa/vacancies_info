@@ -1,22 +1,48 @@
-# Programming vacancies compare
-
-[TODO: here would be project description]
-
-### How to install
-
-[TODO: tell people what should be done]
-
-### Project Goals
-
-The code is written for educational purposes on online-course for web-developers [dvmn.org](https://dvmn.org/).
-
 # Сравниваем вакансии программистов
 
-[TODO: тут должно быть описание проекта]
+Скрипт предназначен для поиска вакансий и получения средней заработной платы по вакансии.
+Для сравнения выводятся вакансии с 2х сервисов: HeadHunter и SuperJob
 
-### Как установить
+## Как установить
 
-[TODO: опишите как запустить проект]
+### Скачать исходный код
+
+- командой `$ git clone https://github.com/piterskikhsa/vacancies_info`
+ 
+
+### Скачать зависимости
+
+Убедитесь, что вы находитесь в папке с проектом:
+
+```
+$ cd vacancies_info
+```
+Скачать и установить зависимости:
+
+```
+pipenv install
+```
+
+Активировать созданное виртуальное окружение:
+```
+pipenv shell
+```
+
+### Запустить
+
+Перед запуском убедитесь, что вы зарегистрировались на сайте SuperJob  и добавили в переменные окружения полученный токен.
+Например в файл .env:
+
+```
+...
+SUPERJOB_TOKEN=v3.r.1236 ....
+```
+
+Можем запускать:
+
+```
+python vacancies_info.py
+```
 
 ### Цель проекта
 

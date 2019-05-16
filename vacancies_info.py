@@ -44,9 +44,9 @@ def get_predict_rub_salary_sj(vacancy):
     return get_predict_salary(vacancy['payment_from'], vacancy['payment_to'])
 
 
-def get_salary_from_vacancies(vacancies_list, func_predict):
+def get_salary_from_vacancies(vacancies_data, func_predict):
     salary = []
-    for vacancy in vacancies_list:
+    for vacancy in vacancies_data:
         salary.append(func_predict(vacancy))
     return salary
 
@@ -76,7 +76,6 @@ def get_all_hh_vacancies(search_vacancy):
     while page < page_number:
         params['page'] = page
         vacancy_info = get_vacancies(url, params)
-        sleep(0.5)
         page_number = vacancy_info['pages']
         page += 1
         vacancies['items'].extend(vacancy_info['items'])
@@ -86,7 +85,7 @@ def get_all_hh_vacancies(search_vacancy):
 
 
 def get_all_sj_vacancies(search_vacancy):
-    headers = {'X-Api-App-Id': os.getenv('SECRET_KEY')}
+    headers = {'X-Api-App-Id': os.getenv('SUPERJOB_TOKEN')}
     url = 'https://api.superjob.ru/2.0/vacancies/'
     params = {
         'town': 4,
@@ -111,22 +110,10 @@ def get_all_sj_vacancies(search_vacancy):
     return vacancies
 
 
-def get_hh_vacancy_info(vacancy):
-    vacancies = get_all_hh_vacancies(vacancy)
-    vacancies_salary = get_salary_from_vacancies(vacancies['items'], get_predict_rub_salary_hh)
+def get_vacancy_info(vacancies_data, predict_rub_salary):
+    vacancies_salary = get_salary_from_vacancies(vacancies_data['items'], predict_rub_salary)
     vacancy_info = {
-        "vacancies_found": vacancies['found'],
-        "vacancies_processed": len(list(filter(lambda x: x, vacancies_salary))),
-        "average_salary": get_average_salary(vacancies_salary)
-    }
-    return vacancy_info
-
-
-def get_sj_vacancy_info(vacancy):
-    vacancies = get_all_sj_vacancies(vacancy)
-    vacancies_salary = get_salary_from_vacancies(vacancies['items'], get_predict_rub_salary_sj)
-    vacancy_info = {
-        "vacancies_found": vacancies['found'],
+        "vacancies_found": vacancies_data['found'],
         "vacancies_processed": len(list(filter(lambda x: x, vacancies_salary))),
         "average_salary": get_average_salary(vacancies_salary)
     }
@@ -148,29 +135,37 @@ def formate_table(vacancies_info):
     return table_data
 
 
+def print_info_from_vacancies_site(vacancies_job, api_handlers):
+    for site_name, (all_vacancies_handler, predict_handler) in api_handlers.items():
+        vacancies_info = {}
+        for vacancy in vacancies_job:
+            vacancies = all_vacancies_handler(vacancy)
+            vacancies_info[vacancy] = get_vacancy_info(vacancies, predict_handler)
+
+        vacancies_info_table = formate_table(vacancies_info)
+
+        table = AsciiTable(vacancies_info_table)
+        print(f'Вакансии с {site_name}')
+        print(table.table)
+
+
 def main():
     vacancies_list = [
         'JavaScript',
         'Java',
         'Python',
         'Kotlin',
+        'PHP', 
         'Swift',
-        'PHP'
+        'objective-c',
+        'C#'
     ]
-    result_sj = {}
-    result_hh = {}
-    for vacancy in vacancies_list:
-        result_hh[vacancy] = get_hh_vacancy_info(vacancy)
-        result_sj[vacancy] = get_sj_vacancy_info(vacancy)
+    handlers = {
+        'headhunter': (get_all_hh_vacancies, get_predict_rub_salary_hh),
+        'super job': (get_all_sj_vacancies, get_predict_rub_salary_sj)
+    }
 
-    hh_info_table = formate_table(result_hh)
-    sj_info_table = formate_table(result_sj)
-
-    hh_table = AsciiTable(hh_info_table)
-    sj_table = AsciiTable(sj_info_table)
-
-    print(hh_table.table)
-    print(sj_table.table)
+    print_info_from_vacancies_site(vacancies_list, handlers)
 
 
 if __name__ == '__main__':
